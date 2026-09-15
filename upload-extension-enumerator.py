@@ -3,18 +3,28 @@
 import signal 
 import time 
 import sys
+import pdb
+import requests
+
 def def_handler(sig, frame):
 
-    print("[+]Saliendo...")
+    print("\n\n[+]Saliendo...")
 
     sys.exit(1);
 
 signal.signal(signal.SIGINT, def_handler)
+
+
+#Variabel global
+
+transfer_url = "http://10.129.58.48/transfer.aspx"
+
 def upload_extension():
     
-    print("hola")
+    r = requests.get(transfer_url)
+    
+    pdb.set_trace()
 
-    time.sleep(3)
 if __name__=='__main__':
     upload_extension()
 
