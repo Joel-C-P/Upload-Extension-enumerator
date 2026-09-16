@@ -18,9 +18,18 @@ signal.signal(signal.SIGINT, def_handler)
 
 #Variabel global
 
-transfer_url = "http://10.129.58.48/transfer.aspx"
+transfer_url = "http://10.129.58.156/transfer.aspx"
+burp = {"http": "http://127.0.0.1:3439"}
 
-def upload_extension():
+
+def extension_dicctionary():
+    f = open("/usr/share/seclists/Discovery/Web-Content//raft-medium-extensions-lowercase.txt", "rb")
+    
+    for extension in f.readlines():
+        extension = extension.decode().strip()
+        upload_extension(extension)
+
+def upload_extension(extension):
    
     s = requests.session()
     r = s.get(transfer_url)
@@ -30,23 +39,29 @@ def upload_extension():
     param2_eventValidation = re.findall(r'id="__EVENTVALIDATION" value="(.*?)"', r.text)[0]
 
 
-    print(param2_eventValidation)
 
-    print(param1_viewState)
 
     post_data = {
         '__VIEWSTATE': param1_viewState,
         '__EVENTVALIDATION': param2_eventValidation,
         #3re field i'll put it apart because python can handle this format
         'btnUpload': 'Upload'
-    }
+        }
 
     #3re feeld
-    param3_fileUploaded =  { 'FileUpload1': ('test.txt', 'imangen this sis something like hello workld')}
+    param3_fileUploaded =  {'FileUpload1': ('test%s' % extension, 'imangen this sis something like hello workld')}
 
 
     r = s.post(transfer_url, data=post_data, files=param3_fileUploaded)
 
-if __name__=='__main__':
-    upload_extension()
+    if "Invalid File. Please try again" not in r.text: 
+        print(f"La extencion es correcta {extension}")
 
+def main():
+    extension = extension_dicctionary()
+    upload_extension(extension)
+
+if __name__=='__main__':
+
+
+    main()
