@@ -5,7 +5,10 @@ import time
 import sys
 import pdb
 import requests
-import re 
+import re
+from pwn import *
+
+
 
 def def_handler(sig, frame):
 
@@ -18,15 +21,23 @@ signal.signal(signal.SIGINT, def_handler)
 
 #Variabel global
 
-transfer_url = "http://10.129.58.156/transfer.aspx"
-burp = {"http": "http://127.0.0.1:3439"}
+transfer_url = "http://IpTargetHere/SiteThatRequereUploadAFile"
+#burp = {"http": "http://127.0.0.1:3439"}
 
 
 def extension_dicctionary():
+
     f = open("/usr/share/seclists/Discovery/Web-Content//raft-medium-extensions-lowercase.txt", "rb")
+    
+    p1 = log.progress("Upload-Extension-Enumerator")
+    p1.status("Scanning valid extensions....")
+
+    time.sleep(1.5)
+
     
     for extension in f.readlines():
         extension = extension.decode().strip()
+        p1.status(f"Probando con la extension {extension}")
         upload_extension(extension)
 
 def upload_extension(extension):
@@ -55,7 +66,7 @@ def upload_extension(extension):
     r = s.post(transfer_url, data=post_data, files=param3_fileUploaded)
 
     if "Invalid File. Please try again" not in r.text: 
-        print(f"La extencion es correcta {extension}")
+        log.info(f"La extencion es correcta {extension}")
 
 def main():
     extension = extension_dicctionary()
