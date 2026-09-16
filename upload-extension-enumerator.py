@@ -7,7 +7,7 @@ import pdb
 import requests
 import re
 from pwn import *
-
+from concurrent.futures import ThreadPoolExecutor
 
 
 def def_handler(sig, frame):
@@ -21,13 +21,13 @@ signal.signal(signal.SIGINT, def_handler)
 
 #Variabel global
 
-transfer_url = "http://IpTargetHere/SiteThatRequereUploadAFile"
+transfer_url = "http://IP_Target/Upload_Vulnerable_Site"
 #burp = {"http": "http://127.0.0.1:3439"}
 
 
 def extension_dicctionary():
 
-    f = open("/usr/share/seclists/Discovery/Web-Content//raft-medium-extensions-lowercase.txt", "rb")
+    f = open("YourDiccionriExtensions.txt", "rb")
     
     p1 = log.progress("Upload-Extension-Enumerator")
     p1.status("Scanning valid extensions....")
@@ -35,10 +35,16 @@ def extension_dicctionary():
     time.sleep(1.5)
 
     
-    for extension in f.readlines():
-        extension = extension.decode().strip()
-        p1.status(f"Probando con la extension {extension}")
-        upload_extension(extension)
+    #for extension in f.readlines():
+     #   extension = extension.decode().strip()
+      #  p1.status(f"Probando con la extension {extension}")
+       # upload_extension(extension)
+    extensions = f.readlines()
+    #pdb.set_trace()
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        executor.map(lambda extension:upload_extension(extension.decode().strip()), extensions)
+
+
 
 def upload_extension(extension):
    
